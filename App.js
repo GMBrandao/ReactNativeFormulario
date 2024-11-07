@@ -23,7 +23,7 @@ export default function App() {
       return;
     }
 
-    if(email.matchAll(confirmEmail)){
+    if(email ==! confirmEmail){
       Alert.alert("Erro", "Email deve ser igual nos dois campos")
       console.log("Erro", "Email deve ser igual nos dois campos")
     }
