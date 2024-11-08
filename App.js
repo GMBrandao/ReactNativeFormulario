@@ -76,7 +76,7 @@ export default function App() {
         style={styles.input}
         placeholder="Digite seu telefone"
         keyboardType="numeric"
-        value={form.senha}
+        value={form.telefone}
         onChangeText={(value) => handleInputChange('telefone', value)}
       />
 
