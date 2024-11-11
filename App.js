@@ -61,6 +61,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      {/* Formulário */}
       <View style={styles.insideContainer}>
         <Text style={styles.label}>Nome:</Text>
         <TextInput
@@ -108,6 +109,7 @@ export default function App() {
         <Button title="Enviar" onPress={handleSubmit} />
       </View>
 
+      {/* Lista de Usuários */}
       <View style={styles.insideContainer}>
         <Text style={styles.header}>Lista de Usuários</Text>
         <FlatList
