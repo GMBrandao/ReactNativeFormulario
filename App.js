@@ -19,15 +19,15 @@ export default function App() {
 
     if (!nome || !email || !confirmEmail || !documento || !telefone) {
       Alert.alert("Erro", "Todos os campos devem ser preenchidos.");
-      console.log("Erro", "Todos os campos devem ser preenchidos.")
+      console.log("Erro", "Todos os campos devem ser preenchidos.");
       return;
     }
 
-    if(email ==! confirmEmail){
-      Alert.alert("Erro", "Email deve ser igual nos dois campos")
-      console.log("Erro", "Email deve ser igual nos dois campos")
+    if(email !== confirmEmail){
+      Alert.alert("Erro", "Email deve ser igual nos dois campos");
+      console.log("Erro", "Email deve ser igual nos dois campos");
+      return;
     }
-
 
     console.log("Dados do Formulário:", form);
     Alert.alert("Sucesso", "Formulário enviado com sucesso!");
