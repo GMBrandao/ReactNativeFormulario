@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,10 @@ import {
   StyleSheet,
   Alert,
   FlatList,
+  ScrollView,
 } from "react-native";
+
+const ip = "192.168.0.127";
 
 export default function App() {
   const [form, setForm] = useState({
@@ -20,11 +23,33 @@ export default function App() {
 
   const [users, setUsers] = useState([]);
 
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`http://${ip}:7148/api/users`, {
+        method: "GET",
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Ocorreu um erro ao carregar os usuários." + error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   const handleInputChange = (field, value) => {
     setForm({ ...form, [field]: value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { nome, email, confirmEmail, documento, telefone } = form;
 
     if (!nome || !email || !confirmEmail || !documento || !telefone) {
@@ -39,15 +64,33 @@ export default function App() {
       return;
     }
 
-    console.log("Dados do Formulário:", form);
-    Alert.alert("Sucesso", "Formulário enviado com sucesso!");
-    setForm({
-      nome: "",
-      email: "",
-      confirmEmail: "",
-      documento: "",
-      telefone: "",
-    });
+    try {
+      const response = await fetch(`http://${ip}:7148/api/users`, {
+        method: "POST",
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nome, email, documento, telefone }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao enviar os dados");
+      }
+
+      Alert.alert("Sucesso", "Formulário enviado com sucesso!");
+      fetchUsers();
+      setForm({
+        nome: "",
+        email: "",
+        confirmEmail: "",
+        documento: "",
+        telefone: "",
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Ocorreu um erro ao enviar o formulário.");
+    }
   };
 
   const renderItem = ({ item }) => (
@@ -61,58 +104,60 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {/* Formulário */}
-      <View style={styles.insideContainer}>
-        <Text style={styles.label}>Nome:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite seu nome"
-          value={form.nome}
-          onChangeText={(value) => handleInputChange("nome", value)}
-        />
+      <ScrollView nestedScrollEnabled = {true}>
+        {/* Formulário */}
+        <View style={styles.insideContainer}>
+          <Text style={styles.label}>Nome:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu nome"
+            value={form.nome}
+            onChangeText={(value) => handleInputChange("nome", value)}
+          />
 
-        <Text style={styles.label}>Email:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite seu email"
-          keyboardType="email-address"
-          value={form.email}
-          onChangeText={(value) => handleInputChange("email", value)}
-        />
+          <Text style={styles.label}>Email:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu email"
+            keyboardType="email-address"
+            value={form.email}
+            onChangeText={(value) => handleInputChange("email", value)}
+          />
 
-        <Text style={styles.label}>Confirme o Email:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Confirme seu email"
-          keyboardType="email-address"
-          value={form.confirmEmail}
-          onChangeText={(value) => handleInputChange("confirmEmail", value)}
-        />
+          <Text style={styles.label}>Confirme o Email:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirme seu email"
+            keyboardType="email-address"
+            value={form.confirmEmail}
+            onChangeText={(value) => handleInputChange("confirmEmail", value)}
+          />
 
-        <Text style={styles.label}>Documento:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite seu documento"
-          keyboardType="numeric"
-          value={form.documento}
-          onChangeText={(value) => handleInputChange("documento", value)}
-        />
+          <Text style={styles.label}>Documento:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu documento"
+            keyboardType="numeric"
+            value={form.documento}
+            onChangeText={(value) => handleInputChange("documento", value)}
+          />
 
-        <Text style={styles.label}>Telefone:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite seu telefone"
-          keyboardType="numeric"
-          value={form.telefone}
-          onChangeText={(value) => handleInputChange("telefone", value)}
-        />
-        <Button title="Enviar" onPress={handleSubmit} />
-      </View>
+          <Text style={styles.label}>Telefone:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu telefone"
+            keyboardType="numeric"
+            value={form.telefone}
+            onChangeText={(value) => handleInputChange("telefone", value)}
+          />
+          <Button title="Enviar" onPress={handleSubmit} />
+        </View>
 
       {/* Lista de Usuários */}
       <View style={styles.insideContainer}>
         <Text style={styles.header}>Lista de Usuários</Text>
         <FlatList
+          scrollEnabled = {false}
           data={users}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
@@ -121,6 +166,7 @@ export default function App() {
           }
         />
       </View>
+      </ScrollView>
     </View>
   );
 }
